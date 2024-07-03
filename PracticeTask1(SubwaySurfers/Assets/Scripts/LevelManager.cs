@@ -11,6 +11,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private float levelSpeed = 5.0f; //Тоже можно трогать
     [SerializeField] private Transform player;  //А тут нехуй трогать
     [SerializeField] private Transform Obstacles;
+    [SerializeField] private float acceleration = 0.003f;
 
     int itemSpace = 20; // Расстояние между препятствиями. Можно трогать
     int ObstacleCountInMap = 5; // Кол-во препятствий на карте. Тоже можно трогать, только очень нежно
@@ -67,6 +68,15 @@ public class LevelManager : MonoBehaviour
             }
             Obstacles.transform.position -= new Vector3(0, 0, levelSpeed * Time.deltaTime);
         }
+    }
+
+    private void FixedUpdate() 
+    {
+        if(levelSpeed < 25)
+        {
+            levelSpeed += acceleration;
+        }
+        
     }
 
     void SpawnSection()
