@@ -10,9 +10,11 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private float sectionLength = 20.0f;   //Не трогать
     [SerializeField] private float levelSpeed = 5.0f; //Тоже можно трогать
     [SerializeField] private Transform player;  //А тут нехуй трогать
+    [SerializeField] private Transform Obstacles;
 
     int itemSpace = 20; // Расстояние между препятствиями. Можно трогать
-    int itemCountInMap = 5; // Кол-во препятствий на карте. Тоже можно трогать, только очень нежно
+    int ObstacleCountInMap = 5; // Кол-во препятствий на карте. Тоже можно трогать, только очень нежно
+
 
 
     private Dictionary<String, float> RoadPosition = new Dictionary<string, float> // Словарь хранящий координаты для спавна препятствия в зависимости от линии
@@ -22,7 +24,9 @@ public class LevelManager : MonoBehaviour
         {"right", 2.575f}
     };
 
-    [SerializeField] public GameObject ObstaclePrefab; // Префаб препятствия
+    [SerializeField] public Obstacle ObstaclePrefab; // Префаб препятствия
+
+    private Pool<Obstacle> pool;
     public List<GameObject> maps = new List<GameObject>(); // Лист из карт
 
 
@@ -32,12 +36,17 @@ public class LevelManager : MonoBehaviour
 
     private void Start() 
     {
+
         for(int i = 0; i < initialSections; i++)
         {
             SpawnSection();
         }
 
+        pool = new Pool<Obstacle>(ObstaclePrefab, ObstacleCountInMap, Obstacles.transform);
+
         maps.Add(MakeMap()); // Создание карты
+
+        
     }
 
     private void Update() 
@@ -52,7 +61,11 @@ public class LevelManager : MonoBehaviour
 
         foreach(var map in maps) // Хуепуталы двигаются в сторону игрока
         {
-            map.transform.position -= new Vector3(0, 0, levelSpeed * Time.deltaTime);
+            if(map.transform.position.z < player.position.z - sectionLength*5)
+            {
+                map.SetActive(false);
+            }
+            Obstacles.transform.position -= new Vector3(0, 0, levelSpeed * Time.deltaTime);
         }
     }
 
@@ -86,10 +99,10 @@ public class LevelManager : MonoBehaviour
     GameObject MakeMap()
     {
         GameObject result = new GameObject("map");
-        result.transform.SetParent(transform);
-        for (int i = 0; i < itemCountInMap; i++)
+        result.transform.SetParent(Obstacles);
+        for (int i = 0; i < ObstacleCountInMap; i++)
         {
-            GameObject obstacle = null;
+            Obstacle obstacle = null;
             float roadPos =  RoadPosition["mid"];
 
             if(i==2) {roadPos = RoadPosition["left"]; obstacle = ObstaclePrefab;}
@@ -99,7 +112,8 @@ public class LevelManager : MonoBehaviour
             Vector3 obstaclePos = new Vector3(roadPos, 0, i*itemSpace);
             if (obstacle != null)
             {
-                GameObject go = Instantiate(obstacle, obstaclePos, Quaternion.identity);
+                Obstacle go = pool.GetFreeElement();
+                go.transform.position = obstaclePos;
                 go.transform.SetParent(result.transform);
             }
         }

@@ -35,7 +35,7 @@ public class Pool<T> where T : MonoBehaviour
         return createdObj;
     }
 
-    public bool HasFreeElement(out T element)
+    public bool HasFreeElement(out T element) // Проверяет, есть ли свободный (не активный) элемент
     {
         foreach ( var mono in poolList)
         {
@@ -51,7 +51,7 @@ public class Pool<T> where T : MonoBehaviour
         return false;
     }
 
-    public T GetFreeElement()
+    public T GetFreeElement() // Возвращает свободный (не активный) элемент
     {
         if(HasFreeElement(out var element))
         {
