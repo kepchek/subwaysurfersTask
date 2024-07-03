@@ -10,10 +10,13 @@ public class Pool<T> where T : MonoBehaviour
 
     private List<T> poolList;
 
+    private int count;
+
     public Pool(T prefab, int count, Transform container)
     {
         this.prefab = prefab;
         this.container = container;
+        this.count = count;
         this.CreatePool(count);
     }
 
@@ -61,4 +64,16 @@ public class Pool<T> where T : MonoBehaviour
         throw new System.Exception($"Дурила, нет у тебя свободных элементов");
 
     }
+
+    public float GetCordLastActiveMember()
+    {
+        float result = 0;
+        for(int i = 0; i < count; i++)
+        {
+            if(poolList[i].isActiveAndEnabled) result = poolList[i].transform.position.z;
+        }
+
+        return result;
+    }
+
 }

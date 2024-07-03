@@ -10,7 +10,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private float sectionLength = 20.0f;   //Не трогать
     [SerializeField] private float levelSpeed = 5.0f; //Тоже можно трогать
     [SerializeField] private Transform player;  //А тут нехуй трогать
-    [SerializeField] private Transform Obstacles;
+    [SerializeField] private Transform Obstacles; //А тут хуй трогать
     [SerializeField] private float acceleration = 0.003f;
 
     int itemSpace = 10; // Расстояние между препятствиями. Можно трогать
@@ -46,6 +46,9 @@ public class LevelManager : MonoBehaviour
         pool = new Pool<Obstacle>(ObstaclePrefab, ObstacleCountInMap, Obstacles.transform);
 
         maps.Add(MakeMap()); // Создание карты
+
+        var createdObj = Instantiate(ObstaclePrefab, Obstacles.transform);
+        createdObj.transform.position = new Vector3(0, 0, pool.GetCordLastActiveMember() + itemSpace);
 
         
     }
