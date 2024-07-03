@@ -13,16 +13,16 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private Transform Obstacles;
     [SerializeField] private float acceleration = 0.003f;
 
-    int itemSpace = 20; // Расстояние между препятствиями. Можно трогать
-    int ObstacleCountInMap = 5; // Кол-во препятствий на карте. Тоже можно трогать, только очень нежно
+    int itemSpace = 10; // Расстояние между препятствиями. Можно трогать
+    int ObstacleCountInMap = 10; // Кол-во препятствий на карте. Тоже можно трогать, только очень нежно
 
 
 
-    private Dictionary<String, float> RoadPosition = new Dictionary<string, float> // Словарь хранящий координаты для спавна препятствия в зависимости от линии
+    private Dictionary<int, float> RoadPosition = new Dictionary<int, float> // Словарь хранящий координаты для спавна препятствия в зависимости от линии, 1 - первая дорога, 2 - вторая, 3 - третья, счёт слева
     {
-        {"left", -2.575f},
-        {"mid", 0},
-        {"right", 2.575f}
+        {1, -2.575f},
+        {2, 0},
+        {3, 2.575f}
     };
 
     [SerializeField] public Obstacle ObstaclePrefab; // Префаб препятствия
@@ -112,6 +112,21 @@ public class LevelManager : MonoBehaviour
         result.transform.SetParent(Obstacles);
         for (int i = 0; i < ObstacleCountInMap; i++)
         {
+            int rnd = UnityEngine.Random.Range(1,4);
+            Vector3 obstaclePos = new Vector3(RoadPosition[rnd], 0, i*itemSpace ); // +20 для того, чтобы первое препятствие не спавнилось прям перед игроков
+            Obstacle go = pool.GetFreeElement();
+            go.transform.position = obstaclePos;
+            go.transform.SetParent(result.transform);
+        }
+        return result;
+    }
+
+/*    GameObject MakeMap()
+    {
+        GameObject result = new GameObject("map");
+        result.transform.SetParent(Obstacles);
+        for (int i = 0; i < ObstacleCountInMap; i++)
+        {
             Obstacle obstacle = null;
             float roadPos =  RoadPosition["mid"];
 
@@ -129,7 +144,7 @@ public class LevelManager : MonoBehaviour
         }
         return result;
     }
-    
+*/
 
 
 }
