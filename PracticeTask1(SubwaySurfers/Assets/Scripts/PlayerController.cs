@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class PlayerController : MonoBehaviour
     private int RightEdge = 2;
     [SerializeField] private float moveDistance = 2.575f; //Расстояние на которое перемещается игрок при нажатии стрелки
     [SerializeField] private float moveSpeed = 5.0f; //Скорость перемещения игрока
+    [SerializeField] private GameObject GameoverMenu;
 
     private Vector3 targetPos; //Коорды целевой позиции
 
@@ -31,7 +33,22 @@ public class PlayerController : MonoBehaviour
         }
 
         transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
+
+        
+    
     }
+    private void OnCollisionEnter(Collision other) {
+    if(other.gameObject.CompareTag("Obstacle"))
+    {
+        Time.timeScale = 0;
+        GameoverMenu.SetActive(true);
+    }
+    }
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(0);
+    }
+
 
 
     
