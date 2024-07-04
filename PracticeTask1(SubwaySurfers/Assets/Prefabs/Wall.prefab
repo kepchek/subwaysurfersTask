@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6561994413283639773}
   m_Layer: 0
   m_Name: Wall
-  m_TagString: Obstacle
+  m_TagString: Respawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -104,8 +104,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 1, z: 1.3328068}
+  m_Center: {x: 0, y: 0, z: -0.16640307}
 --- !u!114 &6561994413283639773
 MonoBehaviour:
   m_ObjectHideFlags: 0

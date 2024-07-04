@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     private void Start() 
     {
         targetPos = transform.position;
+        Time.timeScale = 1;
     }
 
     private void Update() 
@@ -38,7 +39,8 @@ public class PlayerController : MonoBehaviour
     
     }
     private void OnCollisionEnter(Collision other) {
-    if(other.gameObject.CompareTag("Obstacle"))
+    Debug.Log("Коллизия сработала, а Олег пидор");
+    if(other.gameObject.tag == "Respawn")
     {
         Time.timeScale = 0;
         GameoverMenu.SetActive(true);
