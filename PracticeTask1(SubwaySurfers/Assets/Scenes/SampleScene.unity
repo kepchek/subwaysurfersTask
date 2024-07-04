@@ -508,14 +508,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelSectionPrefab: {fileID: 3552470709174254411, guid: 0f6f6edd19b94d44cabdbe4fa215ecdf, type: 3}
-  initialSections: 6
+  initialSections: 10
   sectionLength: 20
   levelSpeed: 5
   player: {fileID: 1623072215}
   Obstacles: {fileID: 502729323}
   acceleration: 0.003
   ObstaclePrefab: {fileID: 6561994413283639773, guid: 9df9f80e099f47a409ba3b551f91e6fc, type: 3}
-  maps: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
