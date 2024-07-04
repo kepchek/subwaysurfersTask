@@ -13,22 +13,23 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private Transform Obstacles; //А тут хуй трогать
     [SerializeField] private float acceleration = 0.003f;
 
-    int itemSpace = 10; // Расстояние между препятствиями. Можно трогать
+    int itemSpace = 8; // Расстояние между препятствиями. Можно трогать
     int ObstacleCountInMap = 10; // Кол-во препятствий на карте. Тоже можно трогать, только очень нежно
+    
+    float LastActiveObsNow;
 
 
 
-    private Dictionary<int, float> RoadPosition = new Dictionary<int, float> // Словарь хранящий координаты для спавна препятствия в зависимости от линии, 1 - первая дорога, 2 - вторая, 3 - третья, счёт слева
+    private Dictionary<int, float> RoadPosition = new Dictionary<int, float> // Словарь хранящий координаты для спавна препятствия в зависимости от линии, 0 - первая дорога, 1 - вторая, 2 - третья, счёт слева
     {
-        {1, -2.575f},
-        {2, 0},
-        {3, 2.575f}
+        {0, -2.575f},
+        {1, 0},
+        {2, 2.575f}
     };
 
     [SerializeField] public Obstacle ObstaclePrefab; // Префаб препятствия
 
-    private Pool<Obstacle> pool;
-    public List<GameObject> maps = new List<GameObject>(); // Лист из карт
+    private Pool<Obstacle> poolObstacles;
 
 
 
@@ -43,14 +44,11 @@ public class LevelManager : MonoBehaviour
             SpawnSection();
         }
 
-        pool = new Pool<Obstacle>(ObstaclePrefab, ObstacleCountInMap, Obstacles.transform);
+        poolObstacles = new Pool<Obstacle>(ObstaclePrefab, ObstacleCountInMap, Obstacles.transform);
+        LastActiveObsNow = 40;
+        Debug.Log(LastActiveObsNow);
 
-        maps.Add(MakeMap()); // Создание карты
-
-        var createdObj = Instantiate(ObstaclePrefab, Obstacles.transform);
-        createdObj.transform.position = new Vector3(0, 0, pool.GetCordLastActiveMember() + itemSpace);
-
-        
+        MakeObstacles(); 
     }
 
     private void Update() 
@@ -63,18 +61,12 @@ public class LevelManager : MonoBehaviour
             FixSpawnSection();//Почему здесь фиксспавнсекшн? Потому что я дебил, а ещё есть баг, в том что метод не универсальный и я спёкся его чинить и придумал крутой костыль! Завтра попробую починить, удачи!
         }
 
-        foreach(var map in maps) // Хуепуталы двигаются в сторону игрока
-        {
-            if(map.transform.position.z < player.position.z - sectionLength*5)
-            {
-                map.SetActive(false);
-            }
-            Obstacles.transform.position -= new Vector3(0, 0, levelSpeed * Time.deltaTime);
-        }
+        MoveObstacles();
     }
 
     private void FixedUpdate() 
     {
+        CheckWhereObstacle();
         if(levelSpeed < 25)
         {
             levelSpeed += acceleration;
@@ -103,51 +95,85 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    void MoveObstacles()
+    {
+        foreach(var obstacle in poolObstacles)
+        {
+            if(obstacle.isActiveAndEnabled)
+            {
+                obstacle.transform.position -= new Vector3(0, 0, levelSpeed * Time.deltaTime);
+            }
+        }
+    }
+
     void RemoveSection()
     {
         GameObject oldSection = sectionsQueue.Dequeue();
         Destroy(oldSection);
     }
 
-    GameObject MakeMap()
+    void MakeObstacles()
     {
-        GameObject result = new GameObject("map");
-        result.transform.SetParent(Obstacles);
+        for (int i = 0; i < ObstacleCountInMap/2; i++)
+        {
+            int rnd = UnityEngine.Random.Range(0,3);
+            int rnd2 = UnityEngine.Random.Range(1,3);
+            Debug.Log(rnd);
+            Debug.Log(rnd2);
+            Vector3 firstObstaclePos = new Vector3(RoadPosition[rnd], 0, i*itemSpace ); // +20 для того, чтобы первое препятствие не спавнилось прям перед игроков
+            Vector3 secondObstaclePos = new Vector3(RoadPosition[Math.Abs(rnd-rnd2)], 0, i*itemSpace );
+
+            Obstacle firstObs = poolObstacles.GetFreeElement();
+            firstObs.transform.position = firstObstaclePos;
+            firstObs.transform.SetParent(Obstacles.transform);
+
+            Obstacle secondObs = poolObstacles.GetFreeElement();
+            secondObs.transform.position = secondObstaclePos;
+            secondObs.transform.SetParent(Obstacles.transform);
+        }
+    }
+    
+    void CheckWhereObstacle()
+    {
+        int rnd = UnityEngine.Random.Range(0,3);
+        int rnd2 = UnityEngine.Random.Range(1,3);
+        foreach(var obstacle in poolObstacles)
+        {
+            if(obstacle.isActiveAndEnabled && obstacle.transform.position.z < player.position.z - itemSpace)
+            {
+                obstacle.transform.position = new Vector3(RoadPosition[Math.Abs(rnd - rnd2)], 0, LastActiveObsNow);
+            }
+        }
+        LastActiveObsNow += itemSpace;
+    }
+
+  /* 
+    
+    void MakeObstacles()
+    {
         for (int i = 0; i < ObstacleCountInMap; i++)
         {
             int rnd = UnityEngine.Random.Range(1,4);
             Vector3 obstaclePos = new Vector3(RoadPosition[rnd], 0, i*itemSpace ); // +20 для того, чтобы первое препятствие не спавнилось прям перед игроков
-            Obstacle go = pool.GetFreeElement();
+            Obstacle go = poolObstacles.GetFreeElement();
             go.transform.position = obstaclePos;
-            go.transform.SetParent(result.transform);
+            go.transform.SetParent(Obstacles.transform);
         }
-        return result;
     }
 
-/*    GameObject MakeMap()
+    void CheckWhereObstacle()
     {
-        GameObject result = new GameObject("map");
-        result.transform.SetParent(Obstacles);
-        for (int i = 0; i < ObstacleCountInMap; i++)
+        foreach(var obstacle in poolObstacles)
         {
-            Obstacle obstacle = null;
-            float roadPos =  RoadPosition["mid"];
-
-            if(i==2) {roadPos = RoadPosition["left"]; obstacle = ObstaclePrefab;}
-            else if(i==3) {roadPos = RoadPosition["mid"]; obstacle = ObstaclePrefab;}
-            else if(i==4) {roadPos = RoadPosition["right"]; obstacle = ObstaclePrefab;}
-
-            Vector3 obstaclePos = new Vector3(roadPos, 0, i*itemSpace);
-            if (obstacle != null)
+            int rnd = UnityEngine.Random.Range(1,4);
+            if(obstacle.isActiveAndEnabled && obstacle.transform.position.z < player.position.z - itemSpace)
             {
-                Obstacle go = pool.GetFreeElement();
-                go.transform.position = obstaclePos;
-                go.transform.SetParent(result.transform);
+                obstacle.transform.position = new Vector3(RoadPosition[rnd], 0, LastActiveObsNow);
+                LastActiveObsNow += itemSpace;
             }
         }
-        return result;
     }
-*/
+    */
 
 
 }

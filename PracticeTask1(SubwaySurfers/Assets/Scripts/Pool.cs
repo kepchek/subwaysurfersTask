@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pool<T> where T : MonoBehaviour
+public class Pool<T> : IEnumerable<T> where T : MonoBehaviour
 {
     public T prefab { get; }    
     
@@ -65,15 +65,19 @@ public class Pool<T> where T : MonoBehaviour
 
     }
 
-    public float GetCordLastActiveMember()
+    public T GetForIndex(int index)
     {
-        float result = 0;
-        for(int i = 0; i < count; i++)
-        {
-            if(poolList[i].isActiveAndEnabled) result = poolList[i].transform.position.z;
-        }
+        return poolList[index];
+    }
 
-        return result;
+    public IEnumerator<T> GetEnumerator()
+    {
+        return poolList.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 
 }

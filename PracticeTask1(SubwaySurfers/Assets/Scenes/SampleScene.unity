@@ -891,7 +891,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelSectionPrefab: {fileID: 3552470709174254411, guid: 0f6f6edd19b94d44cabdbe4fa215ecdf, type: 3}
-  initialSections: 6
+  initialSections: 10
   sectionLength: 20
   levelSpeed: 5
   player: {fileID: 1623072215}
