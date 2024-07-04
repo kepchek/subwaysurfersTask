@@ -43,7 +43,7 @@ public class LevelManager : MonoBehaviour
         }
 
         poolObstacles = new Pool<Obstacle>(ObstaclePrefab, ObstacleCountInMap, Obstacles.transform);
-        LastActiveObsNow = 40;
+        LastActiveObsNow = 100;
         MakeObstacles(); 
 
         foreach (var obstacle in poolObstacles)
@@ -71,8 +71,6 @@ public class LevelManager : MonoBehaviour
             passedObstacle.transform.position = new Vector3(RoadPosition[rnd], 0, LastActiveObsNow);
             obstaclesQueue.Enqueue(passedObstacle);
             counter++;
-
-            if(counter%2 == 0) LastActiveObsNow += itemSpace;
         }
     }
 
@@ -128,8 +126,8 @@ public class LevelManager : MonoBehaviour
         {
             int rnd = UnityEngine.Random.Range(0, 3);
             int rnd2 = UnityEngine.Random.Range(1, 3);
-            Vector3 firstObstaclePos = new Vector3(RoadPosition[rnd], 0, i * itemSpace);
-            Vector3 secondObstaclePos = new Vector3(RoadPosition[Math.Abs(rnd - rnd2)], 0, i * itemSpace);
+            Vector3 firstObstaclePos = new Vector3(RoadPosition[rnd], 0, i * itemSpace + 20);
+            Vector3 secondObstaclePos = new Vector3(RoadPosition[Math.Abs(rnd - rnd2)], 0, i * itemSpace + 20);
 
             Obstacle firstObs = poolObstacles.GetFreeElement();
             firstObs.transform.position = firstObstaclePos;
@@ -143,7 +141,7 @@ public class LevelManager : MonoBehaviour
         }
 
         // Ensure the last obstacle position is correctly set
-        LastActiveObsNow = obstaclesQueue.Peek().transform.position.z + itemSpace * (ObstacleCountInMap / 2);
+        //LastActiveObsNow = obstaclesQueue.Peek().transform.position.z + itemSpace * (ObstacleCountInMap / 2);
     }
 
     void RepositionObstacle()
