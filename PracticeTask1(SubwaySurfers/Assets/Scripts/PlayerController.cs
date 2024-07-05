@@ -39,7 +39,6 @@ public class PlayerController : MonoBehaviour
     
     }
     private void OnCollisionEnter(Collision other) {
-    Debug.Log("Коллизия сработала, а Олег пидор");
     if(other.gameObject.tag == "Respawn")
     {
         Time.timeScale = 0;

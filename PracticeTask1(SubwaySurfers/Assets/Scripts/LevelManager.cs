@@ -9,16 +9,14 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private int initialSections = 6; //Кол-во секций вначале  <-- Можно трогать
     [SerializeField] private float sectionLength = 20.0f;   //Не трогать
     [SerializeField] private float levelSpeed = 5.0f; //Тоже можно трогать
-    [SerializeField] private Transform player;  //А тут нехуй трогать
-    [SerializeField] private Transform Obstacles; //А тут хуй трогать
+    [SerializeField] private Transform player;
+    [SerializeField] private Transform Obstacles;
     [SerializeField] private float acceleration = 0.003f;
 
     int itemSpace = 8; // Расстояние между препятствиями. Можно трогать
     int ObstacleCountInMap = 25; // Кол-во препятствий на карте. Тоже можно трогать, только очень нежно
-
-    int counter = 0; // 
     
-    float LastActiveObsNow;
+    float ObstacleSpawnPoint;
 
     private Dictionary<int, float> RoadPosition = new Dictionary<int, float> // Словарь хранящий координаты для спавна препятствия в зависимости от линии, 0 - первая дорога, 1 - вторая, 2 - третья, счёт слева
     {
@@ -42,14 +40,9 @@ public class LevelManager : MonoBehaviour
             SpawnSection();
         }
 
-        poolObstacles = new Pool<Obstacle>(ObstaclePrefab, ObstacleCountInMap, Obstacles.transform);
-        LastActiveObsNow = 100;
+        poolObstacles = new Pool<Obstacle>(ObstaclePrefab, ObstacleCountInMap, Obstacles.transform); // создание пула препятствий
+        ObstacleSpawnPoint = 100; // точка спавна новых препятствий
         MakeObstacles(); 
-
-        foreach (var obstacle in poolObstacles)
-        {
-            Debug.Log(obstacle.transform.position.z);
-        }
     }
 
     private void Update() 
@@ -64,13 +57,13 @@ public class LevelManager : MonoBehaviour
 
         MoveObstacles();
 
-        if (obstaclesQueue.Peek().transform.position.z < player.position.z - itemSpace)
+        if (obstaclesQueue.Peek().transform.position.z < player.position.z - itemSpace) // перемещение пройденного игроком объекта в конец игрового поля
         {
             Obstacle passedObstacle = obstaclesQueue.Dequeue();
             int rnd = UnityEngine.Random.Range(0, 3);
-            passedObstacle.transform.position = new Vector3(RoadPosition[rnd], 0, LastActiveObsNow);
+            passedObstacle.transform.position = new Vector3(RoadPosition[rnd], 0, ObstacleSpawnPoint);
             obstaclesQueue.Enqueue(passedObstacle);
-            counter++;
+
         }
     }
 
@@ -139,18 +132,5 @@ public class LevelManager : MonoBehaviour
             secondObs.transform.SetParent(Obstacles.transform);
             obstaclesQueue.Enqueue(secondObs);
         }
-
-        // Ensure the last obstacle position is correctly set
-        //LastActiveObsNow = obstaclesQueue.Peek().transform.position.z + itemSpace * (ObstacleCountInMap / 2);
-    }
-
-    void RepositionObstacle()
-    {
-        Obstacle passedObstacle = obstaclesQueue.Dequeue();
-        int rnd = UnityEngine.Random.Range(0, 3);
-        passedObstacle.transform.position = new Vector3(RoadPosition[rnd], 0, LastActiveObsNow);
-        obstaclesQueue.Enqueue(passedObstacle);
-
-        LastActiveObsNow += itemSpace;
     }
 }
